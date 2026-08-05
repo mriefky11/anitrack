@@ -1,2 +1,6 @@
 @import 'tailwindcss';
-@plugin "daisyui";
+@source "./src/**/*.vue";
+@source "../node_modules/daisyui/dist/";
+@plugin "daisyui" {
+  themes: light, dark; /* atau themes: false kalau mau full custom */
+}

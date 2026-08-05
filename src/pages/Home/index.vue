@@ -11,7 +11,7 @@ const animeStore = useAnimeStore()
  * Fetch data saat halaman dibuka
  */
 onMounted(() => {
-  animeStore.fetchTopAnime()
+  // animeStore.fetchTopAnime({ limit: 10 })
 })
 </script>
 
