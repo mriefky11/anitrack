@@ -44,8 +44,8 @@ function isActive(item) {
 <template>
   <aside
     :class="[
-      'flex flex-col shrink-0 bg-base-200 border-r border-base-300 transition-all duration-300 ease-in-out',
-      open ? 'w-64 overflow-hidden' : 'w-14 overflow-visible',
+      'flex flex-col shrink-0 bg-base-200 border-r border-base-300 transition-all duration-300 ease-in-out h-screen overflow-y-auto',
+      open ? 'w-64' : 'w-14 overflow-visible',
     ]"
   >
     <!-- Brand -->
@@ -53,7 +53,9 @@ function isActive(item) {
       <RouterLink v-if="open" to="/" class="font-bold tracking-widest text-sm whitespace-nowrap">
         LIVE<span class="text-primary">NIME</span>
       </RouterLink>
-      <span v-else class="w-2 h-2 rounded-full bg-primary mx-auto" />
+      <span v-else class="font-bold tracking-widest text-sm whitespace-nowrap">
+        L<span class="text-primary">N</span>
+      </span>
     </div>
 
     <!-- Menu -->
