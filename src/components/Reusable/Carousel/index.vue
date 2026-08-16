@@ -1,4 +1,5 @@
 <script setup>
+import { Star } from '@lucide/vue'
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
@@ -10,6 +11,7 @@ const current = ref(0)
 let interval = null
 
 const next = () => {
+  if (!props.items?.length) return
   current.value = (current.value + 1) % props.items.length
 }
 const goTo = (index) => {
@@ -75,19 +77,20 @@ onUnmounted(() => {
           class="h-64 w-44 object-cover rounded-xl shadow-2xl flex-shrink-0 border border-white/10"
         />
         <div class="text-white">
-          <div v-if="item.rating" class="flex items-center gap-2 mb-3">
-            <span class="bg-yellow-50 text-black text-xs font-bold px-2 py-1 rounded-full">
-              ⭐ {{ item.rating }}
+          <div v-if="item.rating" class="mb-3">
+            <span class="flex items-center gap-1 badge badge-warning font-bold">
+              <Star class="w-3 h-3" /> {{ item.rating }}
             </span>
-            <span class="text-white/50 text-xs">/ 100</span>
           </div>
           <h2 class="text-3xl font-extrabold leading-tight mb-3 drop-shadow text-base-content">
             {{ item.title }}
           </h2>
-          <p class="text-sm leading-relaxed line-clamp-4 text-base-content/70">
+          <p class="text-md leading-relaxed line-clamp-4 text-base-content/70">
             {{ item.description }}
           </p>
-          <button class="mt-5 btn btn-sm btn-primary rounded-full px-6">Lihat Detail →</button>
+          <RouterLink :to="{ name: 'DetailAnime', params: { id: item.id } }">
+            <button class="mt-5 btn btn-sm btn-primary rounded-full px-6">View Detail →</button>
+          </RouterLink>
         </div>
       </div>
     </div>

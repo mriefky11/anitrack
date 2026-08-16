@@ -26,7 +26,7 @@ const carouselItems = computed(() =>
     title: anime.title?.romaji,
     image: anime.coverImage?.large,
     description: cleanDescription(anime.description),
-    rating: anime.averageScore,
+    rating: anime.averageScore ? (anime.averageScore / 10).toFixed(1) : null,
   })),
 )
 
@@ -51,18 +51,23 @@ onMounted(() => {
       <Card v-for="n in 10" :key="n" :loading="true" />
     </template>
     <template v-else>
-      <Card
+      <router-link
         v-for="anime in animeList"
         :key="anime.id"
-        :id="String(anime.id)"
-        :title="anime.title?.romaji"
-        :image="anime.coverImage?.large"
-        :rating="anime.format"
-        :status="anime.status"
-        :episodes="anime.episodes"
-        :season="anime.season"
-        :year="anime.year"
-      />
+        :to="{ name: 'DetailAnime', params: { id: anime.id } }"
+      >
+        <Card
+          :id="String(anime.id)"
+          :title="anime.title?.romaji"
+          :image="anime.coverImage?.large"
+          :format="anime.format"
+          :rating="anime.averageScore ? (anime.averageScore / 10).toFixed(1) : null"
+          :status="anime.status"
+          :episodes="anime.episodes"
+          :season="anime.season"
+          :year="anime.seasonYear"
+        />
+      </router-link>
     </template>
   </div>
 
@@ -79,10 +84,10 @@ onMounted(() => {
         :id="String(manga.mal_id)"
         :title="manga.title?.romaji"
         :image="manga.coverImage?.large"
-        :rating="manga.popularity"
+        :popularity="manga.popularity"
         :status="manga.status"
-        :episodes="manga.chapters"
-        :year="manga.published?.prop?.from?.year"
+        :chapters="manga.volumes"
+        :year="manga.startDate?.year"
       />
     </template>
   </div>
@@ -100,7 +105,7 @@ onMounted(() => {
         :id="String(character.id)"
         :title="character.name?.full"
         :image="character.image?.large"
-        :rating="character.favorites"
+        :popularity="character.favourites"
       />
     </template>
   </div>

@@ -10,13 +10,21 @@ const MEDIA_FIELDS = `
       large
     }
     averageScore
-    episodes
-    genres
-    status
-    season
-    seasonYear
-    description
-    popularity
+      genres
+      status
+      description
+      popularity
+      endDate {
+        day
+        month
+        year
+      }
+      startDate {
+        day
+        month
+        year
+      }
+      volumes
 `
 
 export const getTopManga = (limit = 10) =>

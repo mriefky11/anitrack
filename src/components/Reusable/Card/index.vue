@@ -1,4 +1,5 @@
 <script setup>
+import { Heart, Star } from '@lucide/vue'
 const props = defineProps({
   id: { type: String },
   title: { type: String },
@@ -6,20 +7,27 @@ const props = defineProps({
   image: { type: String },
   status: { type: String, default: 'N/A' },
   episodes: { type: [String, Number], default: null },
+  chapters: { type: [String, Number], default: null },
   season: { type: String, default: null },
   year: { type: [String, Number], default: null },
   loading: { type: Boolean, default: false },
+  popularity: { type: String, default: null },
+  format: { type: String, default: null },
 })
 
 const statusClass = {
-  'Currently Airing': 'badge-success',
-  'Finished Airing': 'badge-ghost',
-  'Not yet aired': 'badge-info',
+  RELEASING: 'badge-success',
+  FINISHED: 'badge-neutral',
+  NOT_YET_RELEASED: 'badge-info',
+  CANCELLED: 'badge-error',
+  HIATUS: 'badge-warning',
 }
 const statusLabel = {
-  'Currently Airing': 'Airing',
-  'Finished Airing': 'Finished',
-  'Not yet aired': 'Upcoming',
+  RELEASING: 'Airing',
+  FINISHED: 'Finished',
+  NOT_YET_RELEASED: 'Upcoming',
+  CANCELLED: 'Cancelled',
+  HIATUS: 'Hiatus',
 }
 </script>
 
@@ -40,23 +48,36 @@ const statusLabel = {
   >
     <figure class="relative aspect-[2/3] overflow-hidden bg-base-200">
       <img :src="image" :alt="title" class="w-full h-full object-cover" />
-      <span v-if="rating" class="badge badge-warning badge-sm absolute top-2 left-2 font-medium">
-        {{ rating }}
-      </span>
+      <div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
+        <span v-if="rating" class="badge badge-warning badge-md font-bold">
+          <Star class="w-3 h-3" />
+          {{ rating }}
+        </span>
+        <span v-if="popularity" class="badge badge-secondary badge-md font-bold">
+          <Heart class="w-3 h-3" />
+          {{ popularity }}
+        </span>
+      </div>
       <span
-        v-if="status !== 'N/A'"
-        class="badge badge-sm absolute top-2 right-2 font-medium"
+        v-if="status && status !== 'N/A'"
+        class="badge badge-md absolute top-2 right-2 font-bold"
         :class="statusClass[status] ?? 'badge-ghost'"
       >
         {{ statusLabel[status] ?? status }}
       </span>
     </figure>
-    <div class="card-body p-3 gap-1">
-      <p class="card-title text-sm font-medium leading-snug line-clamp-2">{{ title }}</p>
+    <div class="card-body p-3 gap-1 text-center">
+      <p class="card-title text-md font-medium leading-snug line-clamp-1">
+        {{ title }}
+      </p>
       <p class="text-xs text-base-content/50">
-        <span v-if="episodes">{{ episodes }} eps</span>
-        <span v-if="episodes && (season || year)"> · </span>
-        <span v-if="season || year" class="capitalize">{{ season }} {{ year }}</span>
+        <span v-if="format">{{ format }}</span>
+        <span v-if="episodes"> {{ format ? ' · ' : '' }}{{ episodes }} eps </span>
+        <span v-if="chapters"> {{ format || episodes ? ' · ' : '' }}{{ chapters }} chapter </span>
+        <span v-if="season || year" class="capitalize">
+          {{ format || episodes || chapters ? ' · ' : '' }}
+          {{ season }} {{ year }}
+        </span>
       </p>
     </div>
   </div>

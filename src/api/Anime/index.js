@@ -24,7 +24,6 @@ const MEDIA_FIELDS = `
   }
 `
 
-// Beranda — top anime
 export const getTopAnime = (limit = 10) =>
   gql(
     `
@@ -37,7 +36,6 @@ export const getTopAnime = (limit = 10) =>
     { page: 1, perPage: limit },
   ).then((d) => d.Page.media)
 
-// Beranda — akan tayang
 export const getUpcomingAnime = (limit = 10) =>
   gql(
     `
@@ -50,7 +48,6 @@ export const getUpcomingAnime = (limit = 10) =>
     { page: 1, perPage: limit },
   ).then((d) => d.Page.media)
 
-// Halaman Musim
 export const getSeasonalAnime = (year, season, limit = 20) =>
   gql(
     `
@@ -63,7 +60,6 @@ export const getSeasonalAnime = (year, season, limit = 20) =>
     { year, season: season.toUpperCase(), page: 1, perPage: limit },
   ).then((d) => d.Page.media)
 
-// Halaman Mingguan — jadwal tayang per hari (pakai AiringSchedule)
 export const getWeeklySchedule = (weekStart, weekEnd) =>
   gql(
     `
@@ -80,7 +76,6 @@ export const getWeeklySchedule = (weekStart, weekEnd) =>
     { start: weekStart, end: weekEnd },
   ).then((d) => d.Page.airingSchedules)
 
-// Search
 export const searchAnime = (keyword, limit = 10) =>
   gql(
     `
@@ -93,13 +88,36 @@ export const searchAnime = (keyword, limit = 10) =>
     { search: keyword, page: 1, perPage: limit },
   ).then((d) => d.Page.media)
 
-// Detail + rekomendasi + reviews
+// Detail + trailer + source + characters + recommendations + reviews
 export const getAnimeDetail = (id) =>
   gql(
     `
     query ($id: Int) {
       Media(id: $id, type: ANIME) {
         ${MEDIA_FIELDS}
+        source
+        duration
+        popularity
+        trailer {
+          id
+          site
+          thumbnail
+        }
+        characters(sort: ROLE, perPage: 12) {
+          edges {
+            role
+            node {
+              id
+              name { full native }
+              image { large }
+            }
+            voiceActors(language: JAPANESE) {
+              id
+              name { full }
+              image { large }
+            }
+          }
+        }
         recommendations(sort: RATING_DESC, perPage: 6) {
           nodes { mediaRecommendation { ${MEDIA_FIELDS} } }
         }
@@ -114,5 +132,9 @@ export const getAnimeDetail = (id) =>
 
 export default {
   getTopAnime,
+  getUpcomingAnime,
+  getSeasonalAnime,
+  getWeeklySchedule,
   searchAnime,
+  getAnimeDetail,
 }
