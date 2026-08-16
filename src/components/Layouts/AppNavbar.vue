@@ -57,20 +57,6 @@ function handleSearch(e) {
 
     <div class="flex-1" />
 
-    <!-- Search -->
-    <label
-      class="input input-sm input-bordered flex items-center gap-2 w-44 hidden sm:flex focus-within:w-60 transition-all duration-200"
-    >
-      <Search :size="13" class="opacity-50 shrink-0" />
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search anime..."
-        class="grow bg-transparent outline-none text-sm min-w-0"
-        @keydown="handleSearch"
-      />
-    </label>
-
     <!-- Dark toggle -->
     <button
       class="btn btn-square btn-ghost btn-sm"

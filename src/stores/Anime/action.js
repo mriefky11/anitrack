@@ -7,7 +7,7 @@ export default {
 
     try {
       const res = await api.Anime.getList(params)
-      this.animeList = res.data.data
+      this.animeList = res
     } catch (err) {
       this.error = err
     } finally {
@@ -35,8 +35,8 @@ export default {
     this.error = null
 
     try {
-      const res = await api.Anime.getTop(params)
-      this.animeList = res.data.data
+      const res = await api.Anime.getTopAnime(params)
+      this.animeList = res
     } catch (err) {
       this.error = err
     } finally {

@@ -6,6 +6,7 @@ import { useCharacterStore } from '@/stores/Character'
 import { storeToRefs } from 'pinia'
 import Carosel from '@/components/Reusable/Carousel/index.vue'
 import Card from '@/components/Reusable/Card/index.vue'
+import { cleanDescription } from '@/utils/text'
 
 const animeStore = useAnimeStore()
 const { fetchTopAnime } = animeStore
@@ -21,11 +22,11 @@ const { characterList, loading: characterLoading } = storeToRefs(characterStore)
 
 const carouselItems = computed(() =>
   animeList.value.map((anime) => ({
-    id: anime.mal_id,
-    title: anime.title,
-    image: anime.images?.jpg?.large_image_url,
-    description: anime.synopsis ? anime.synopsis : 'No description',
-    rating: anime.score,
+    id: anime.id,
+    title: anime.title?.romaji,
+    image: anime.coverImage?.large,
+    description: cleanDescription(anime.description),
+    rating: anime.averageScore,
   })),
 )
 
@@ -33,9 +34,9 @@ const carouselItems = computed(() =>
  * Fetch data saat halaman dibuka
  */
 onMounted(() => {
-  fetchTopAnime({ limit: 10 })
-  fetchTopCharacter()
-  fetchTopManga({ limit: 10 })
+  fetchTopAnime(10)
+  fetchTopCharacter(10)
+  fetchTopManga(10)
 })
 </script>
 
@@ -52,11 +53,11 @@ onMounted(() => {
     <template v-else>
       <Card
         v-for="anime in animeList"
-        :key="anime.mal_id"
-        :id="String(anime.mal_id)"
-        :title="anime.title"
-        :image="anime.images?.jpg?.large_image_url"
-        :rating="anime.score"
+        :key="anime.id"
+        :id="String(anime.id)"
+        :title="anime.title?.romaji"
+        :image="anime.coverImage?.large"
+        :rating="anime.format"
         :status="anime.status"
         :episodes="anime.episodes"
         :season="anime.season"
@@ -76,9 +77,9 @@ onMounted(() => {
         v-for="manga in mangaList"
         :key="manga.mal_id"
         :id="String(manga.mal_id)"
-        :title="manga.title"
-        :image="manga.images?.jpg?.large_image_url"
-        :rating="manga.score"
+        :title="manga.title?.romaji"
+        :image="manga.coverImage?.large"
+        :rating="manga.popularity"
         :status="manga.status"
         :episodes="manga.chapters"
         :year="manga.published?.prop?.from?.year"
@@ -95,10 +96,10 @@ onMounted(() => {
     <template v-else>
       <Card
         v-for="character in characterList"
-        :key="character.mal_id"
-        :id="String(character.mal_id)"
-        :title="character.name"
-        :image="character.images?.jpg?.image_url"
+        :key="character.id"
+        :id="String(character.id)"
+        :title="character.name?.full"
+        :image="character.image?.large"
         :rating="character.favorites"
       />
     </template>

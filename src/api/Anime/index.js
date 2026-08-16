@@ -1,9 +1,118 @@
-import http from '../axios' // WAJIB pakai instance
+import { gql } from '../axios.js'
 
-const anime = {
-  getList: (params) => http.get('/anime', { params }),
-  getById: (id) => http.get(`/anime/${id}`),
-  getTop: (params) => http.get('/top/anime', { params }),
+const MEDIA_FIELDS = `
+  id
+  title { romaji english native }
+  coverImage { large color }
+  bannerImage
+  description(asHtml: false)
+  averageScore
+  episodes
+  genres
+  status
+  season
+  seasonYear
+  format
+  studios(isMain: false) {
+    edges {
+      id
+      node {
+        name
+        siteUrl
+      }
+    }
+  }
+`
+
+// Beranda — top anime
+export const getTopAnime = (limit = 10) =>
+  gql(
+    `
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(type: ANIME, sort: SCORE_DESC, isAdult: false) { ${MEDIA_FIELDS} }
+      }
+    }
+  `,
+    { page: 1, perPage: limit },
+  ).then((d) => d.Page.media)
+
+// Beranda — akan tayang
+export const getUpcomingAnime = (limit = 10) =>
+  gql(
+    `
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(type: ANIME, status: NOT_YET_RELEASED, sort: POPULARITY_DESC, isAdult: false) { ${MEDIA_FIELDS} }
+      }
+    }
+  `,
+    { page: 1, perPage: limit },
+  ).then((d) => d.Page.media)
+
+// Halaman Musim
+export const getSeasonalAnime = (year, season, limit = 20) =>
+  gql(
+    `
+    query ($year: Int, $season: MediaSeason, $page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(type: ANIME, seasonYear: $year, season: $season, sort: POPULARITY_DESC, isAdult: false) { ${MEDIA_FIELDS} }
+      }
+    }
+  `,
+    { year, season: season.toUpperCase(), page: 1, perPage: limit },
+  ).then((d) => d.Page.media)
+
+// Halaman Mingguan — jadwal tayang per hari (pakai AiringSchedule)
+export const getWeeklySchedule = (weekStart, weekEnd) =>
+  gql(
+    `
+    query ($start: Int, $end: Int) {
+      Page(page: 1, perPage: 50) {
+        airingSchedules(airingAt_greater: $start, airingAt_lesser: $end) {
+          airingAt
+          episode
+          media { ${MEDIA_FIELDS} }
+        }
+      }
+    }
+  `,
+    { start: weekStart, end: weekEnd },
+  ).then((d) => d.Page.airingSchedules)
+
+// Search
+export const searchAnime = (keyword, limit = 10) =>
+  gql(
+    `
+    query ($search: String, $page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(type: ANIME, search: $search, isAdult: false) { ${MEDIA_FIELDS} }
+      }
+    }
+  `,
+    { search: keyword, page: 1, perPage: limit },
+  ).then((d) => d.Page.media)
+
+// Detail + rekomendasi + reviews
+export const getAnimeDetail = (id) =>
+  gql(
+    `
+    query ($id: Int) {
+      Media(id: $id, type: ANIME) {
+        ${MEDIA_FIELDS}
+        recommendations(sort: RATING_DESC, perPage: 6) {
+          nodes { mediaRecommendation { ${MEDIA_FIELDS} } }
+        }
+        reviews(sort: RATING_DESC, perPage: 5) {
+          nodes { summary rating user { name } }
+        }
+      }
+    }
+  `,
+    { id },
+  ).then((d) => d.Media)
+
+export default {
+  getTopAnime,
+  searchAnime,
 }
-
-export default anime

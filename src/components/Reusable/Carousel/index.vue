@@ -79,7 +79,7 @@ onUnmounted(() => {
             <span class="bg-yellow-50 text-black text-xs font-bold px-2 py-1 rounded-full">
               ⭐ {{ item.rating }}
             </span>
-            <span class="text-white/50 text-xs">/ 10</span>
+            <span class="text-white/50 text-xs">/ 100</span>
           </div>
           <h2 class="text-3xl font-extrabold leading-tight mb-3 drop-shadow text-base-content">
             {{ item.title }}

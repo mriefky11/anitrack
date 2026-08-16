@@ -7,7 +7,7 @@ export default {
 
     try {
       const res = await api.Character.getTop(params)
-      this.characterList = res.data.data
+      this.characterList = res
     } catch (err) {
       this.error = err
     } finally {

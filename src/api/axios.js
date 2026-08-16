@@ -1,60 +1,38 @@
 import axios from 'axios'
 import rateLimit from 'axios-rate-limit'
 
-/**
- * Gabungkan base URL + version dari .env
- * Contoh hasil:
- * https://api.jikan.moe/v4
- */
-const baseURL = import.meta.env.VITE_API_BASE_URL + import.meta.env.VITE_API_VERSION
-
-/**
- * Buat instance axios
- * Tujuannya supaya semua request konsisten (baseURL, timeout, dll)
- */
 const axiosInstance = axios.create({
-  baseURL,
-  timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
+  baseURL: import.meta.env.VITE_ANILIST_BASE_URL,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 10000,
 })
 
-/**
- * Bungkus axios dengan rate limiter
- * Jikan limit kira-kira 2 request per detik
- */
+// AniList: 90 request/menit ≈ 1.5 request/detik, kita ambil konservatif
 const http = rateLimit(axiosInstance, {
-  maxRequests: 2, // max 2 request
-  perMilliseconds: 1000, // per 1 detik
+  maxRequests: 1,
+  perMilliseconds: 700,
 })
 
-/**
- * Response interceptor
- * Handle error global (terutama rate limit 429)
- */
 http.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config
-
-    /**
-     * Kalau kena rate limit (429)
-     * retry otomatis setelah delay
-     */
     if (error.response?.status === 429 && !config._retry) {
       config._retry = true
-
-      // delay 1 detik sebelum retry
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      const retryAfter = Number(error.response.headers['retry-after']) || 5
+      await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000))
       return http(config)
     }
-
-    /**
-     * Optional: logging error biar gampang debug
-     */
-    console.error('API Error:', error.response || error.message)
-
+    console.error('AniList API Error:', error.response?.data || error.message)
     return Promise.reject(error)
   },
 )
+
+// helper: semua request AniList selalu POST ke '' dengan {query, variables}
+export const gql = (query, variables = {}) =>
+  http.post('', { query, variables }).then((res) => {
+    if (res.data.errors) throw new Error(res.data.errors[0].message)
+    return res.data.data
+  })
 
 export default http

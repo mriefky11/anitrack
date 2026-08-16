@@ -25,8 +25,8 @@ const sections = [
     label: 'Discover',
     items: [
       { label: 'Top Anime', to: '/top', icon: TrendingUp },
-      { label: 'Recent', to: '/recent', icon: Clock },
-      { label: 'Top Rated', to: '/rated', icon: Star },
+      { label: 'Top Manga', to: '/top', icon: TrendingUp },
+      { label: 'Top Character', to: '/top', icon: TrendingUp },
     ],
   },
   {

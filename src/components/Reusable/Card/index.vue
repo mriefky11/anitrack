@@ -41,7 +41,7 @@ const statusLabel = {
     <figure class="relative aspect-[2/3] overflow-hidden bg-base-200">
       <img :src="image" :alt="title" class="w-full h-full object-cover" />
       <span v-if="rating" class="badge badge-warning badge-sm absolute top-2 left-2 font-medium">
-        ★ {{ rating }}
+        {{ rating }}
       </span>
       <span
         v-if="status !== 'N/A'"

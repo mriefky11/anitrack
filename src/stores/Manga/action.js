@@ -6,8 +6,8 @@ export default {
     this.error = null
 
     try {
-      const res = await api.Manga.getTop(params)
-      this.mangaList = res.data.data
+      const res = await api.Manga.getTopManga(params)
+      this.mangaList = res
     } catch (err) {
       this.error = err
     } finally {
