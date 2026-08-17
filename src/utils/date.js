@@ -12,3 +12,22 @@ export function formatDateRange(start, end) {
   const endStr = formatDate(end)
   return `${startStr} - ${endStr ?? 'Ongoing'}`
 }
+
+export function formatBirthday({ day, month } = {}) {
+  if (!day || !month) return null
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ]
+  return `${months[month - 1]} ${day}`
+}

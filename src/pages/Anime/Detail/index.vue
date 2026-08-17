@@ -204,13 +204,15 @@ watch(
         <h2 class="text-lg font-semibold mb-4">Characters</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div v-for="c in characters" :key="c.node.id" class="text-center">
-            <Card
-              :id="String(c.node.id)"
-              :title="c.node.name.full"
-              :image="c.node.image?.large"
-              :voiceActors="c.voiceActors[0].name.full"
-              :role="c.role"
-            />
+            <RouterLink :to="{ name: 'DetailCharacter', params: { id: c.node.id } }">
+              <Card
+                :id="String(c.node.id)"
+                :title="c.node.name.full"
+                :image="c.node.image?.large"
+                :voiceActors="c.voiceActors[0]?.name?.full"
+                :role="c.role"
+              />
+            </RouterLink>
           </div>
         </div>
       </div>

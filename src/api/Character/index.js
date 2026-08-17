@@ -2,7 +2,7 @@ import { gql } from '../axios.js'
 
 const CHARACTER_FIELDS = `
   id
-  name { full native }
+  name { full native alternative }
   image { large }
   favourites
   gender
@@ -41,12 +41,25 @@ export const getDetail = (id) =>
         description(asHtml: false)
         dateOfBirth { day month year }
         age
-        media(sort: POPULARITY_DESC, perPage: 6) {
-          nodes {
-            id
-            title { romaji }
-            coverImage { large }
-            averageScore
+        bloodType
+        siteUrl
+        media(sort: POPULARITY_DESC, perPage: 12) {
+          edges {
+            characterRole
+            voiceActors(language: JAPANESE) {
+              id
+              name { full }
+              image { large }
+            }
+            node {
+              id
+              type
+              title { romaji english }
+              coverImage { large }
+              averageScore
+              format
+              status
+            }
           }
         }
       }

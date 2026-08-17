@@ -51,7 +51,7 @@ onMounted(() => {
       <Card v-for="n in 10" :key="n" :loading="true" />
     </template>
     <template v-else>
-      <router-link
+      <RouterLink
         v-for="anime in animeList"
         :key="anime.id"
         :to="{ name: 'DetailAnime', params: { id: anime.id } }"
@@ -67,7 +67,7 @@ onMounted(() => {
           :season="anime.season"
           :year="anime.seasonYear"
         />
-      </router-link>
+      </RouterLink>
     </template>
   </div>
 
@@ -78,7 +78,7 @@ onMounted(() => {
       <Card v-for="n in 10" :key="n" :loading="true" />
     </template>
     <template v-else>
-      <router-link
+      <RouterLink
         :to="{ name: 'DetailManga', params: { id: manga.id } }"
         v-for="manga in mangaList"
         :key="manga.id"
@@ -92,7 +92,7 @@ onMounted(() => {
           :chapters="manga.volumes"
           :year="manga.startDate?.year"
         />
-      </router-link>
+      </RouterLink>
     </template>
   </div>
 
@@ -103,14 +103,18 @@ onMounted(() => {
       <Card v-for="n in 10" :key="n" :loading="true" />
     </template>
     <template v-else>
-      <Card
+      <RouterLink
+        :to="{ name: 'DetailCharacter', params: { id: character.id } }"
         v-for="character in characterList"
         :key="character.id"
-        :id="String(character.id)"
-        :title="character.name?.full"
-        :image="character.image?.large"
-        :popularity="character.favourites"
-      />
+      >
+        <Card
+          :id="String(character.id)"
+          :title="character.name?.full"
+          :image="character.image?.large"
+          :popularity="character.favourites"
+        />
+      </RouterLink>
     </template>
   </div>
 </template>
