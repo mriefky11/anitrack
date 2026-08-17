@@ -13,6 +13,8 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   popularity: { type: String, default: null },
   format: { type: String, default: null },
+  voiceActors: { type: String, default: null },
+  role: { type: String, default: null },
 })
 
 const statusClass = {
@@ -78,6 +80,12 @@ const statusLabel = {
           {{ format || episodes || chapters ? ' · ' : '' }}
           {{ season }} {{ year }}
         </span>
+      </p>
+      <p class="text-xs text-base-content/50">
+        <span v-if="role">{{ role }}</span>
+      </p>
+      <p class="text-xs text-base-content/50">
+        <span v-if="voiceActors">CV : {{ voiceActors }}</span>
       </p>
     </div>
   </div>

@@ -1,30 +1,50 @@
-<!-- src/pages/Anime/Detail/index.vue -->
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { useMangaStore } from '@/stores/Manga'
+import { Heart, Play, Star } from '@lucide/vue'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { getAnimeDetail } from '@/api/Anime'
 import { cleanDescription } from '@/utils/text'
+import { formatDateRange } from '@/utils/date'
 import Card from '@/components/Reusable/Card/index.vue'
-import { Star, Play, Heart } from '@lucide/vue'
 
 const route = useRoute()
-const anime = ref(null)
-const loading = ref(true)
-const error = ref(null)
+
+const mangaStore = useMangaStore()
+const { fetchDetailManga } = mangaStore
+const { mangaDetail, loading, error } = storeToRefs(mangaStore)
+
 const activeTab = ref('overview')
 const showTrailer = ref(false)
 
-const description = computed(() => cleanDescription(anime.value?.description))
 const score = computed(() =>
-  anime.value?.averageScore ? (anime.value.averageScore / 10).toFixed(1) : null,
+  mangaDetail.value?.averageScore ? (mangaDetail.value?.averageScore / 10).toFixed(1) : null,
 )
-const studios = computed(() => anime.value?.studios?.edges?.map((e) => e.node) ?? [])
+const dateRange = computed(() =>
+  formatDateRange(mangaDetail.value?.startDate, mangaDetail.value?.endDate),
+)
+
+const description = computed(() => cleanDescription(mangaDetail.value?.description))
+
+const staff = computed(() => mangaDetail.value?.staff?.edges ?? [])
+
+const trailerUrl = computed(() => {
+  const t = mangaDetail.value?.trailer
+  if (!t) return null
+  if (t.site === 'youtube') return `https://www.youtube.com/embed/${t.id}?autoplay=1`
+  if (t.site === 'dailymotion') return `https://www.dailymotion.com/embed/video/${t.id}?autoplay=1`
+  return null
+})
+
+const characters = computed(() => mangaDetail.value?.characters?.edges ?? [])
+
+const reviews = computed(() => mangaDetail.value?.reviews?.nodes ?? [])
+
 const recommendations = computed(
   () =>
-    anime.value?.recommendations?.nodes?.map((n) => n.mediaRecommendation).filter(Boolean) ?? [],
+    mangaDetail.value?.recommendations?.nodes?.map((n) => n.mediaRecommendation).filter(Boolean) ??
+    [],
 )
-const reviews = computed(() => anime.value?.reviews?.nodes ?? [])
-const characters = computed(() => anime.value?.characters?.edges ?? [])
 
 const sourceLabel = computed(() => {
   const map = {
@@ -44,34 +64,16 @@ const sourceLabel = computed(() => {
     PICTURE_BOOK: 'Picture Book',
     OTHER: 'Other',
   }
-  return map[anime.value?.source] ?? null
+  return map[mangaDetail.value?.source] ?? null
 })
 
-const trailerUrl = computed(() => {
-  const t = anime.value?.trailer
-  if (!t) return null
-  if (t.site === 'youtube') return `https://www.youtube.com/embed/${t.id}?autoplay=1`
-  if (t.site === 'dailymotion') return `https://www.dailymotion.com/embed/video/${t.id}?autoplay=1`
-  return null
+onMounted(() => {
+  fetchDetailManga(route.params.id)
 })
 
-async function fetchDetail(id) {
-  loading.value = true
-  error.value = null
-  showTrailer.value = false
-  try {
-    anime.value = await getAnimeDetail(Number(id))
-  } catch (err) {
-    error.value = err
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => fetchDetail(route.params.id))
 watch(
   () => route.params.id,
-  (id) => id && fetchDetail(id),
+  (id) => id && fetchDetailManga(route.params.id),
 )
 </script>
 
@@ -91,29 +93,29 @@ watch(
     </div>
   </div>
 
-  <!-- ERROR -->
+  <!-- error -->
   <div v-else-if="error" class="mx-auto px-10 py-16 text-center">
-    <p class="text-lg font-medium mb-1">Failed to load anime details</p>
+    <p class="text-lg font-medium mb-1">Failed to load manga details</p>
     <p class="text-sm text-base-content/60 mb-4">
       {{ error.message || 'Something went wrong, please try again.' }}
     </p>
     <button class="btn btn-sm btn-primary" @click="fetchDetail(route.params.id)">Retry</button>
   </div>
 
-  <!-- CONTENT -->
-  <div v-else-if="anime" class="pb-16 px-10">
+  <!-- content -->
+  <div v-else-if="mangaDetail" class="pb-16 px-10">
     <!-- Banner -->
     <div class="relative w-full h-56 md:h-72 overflow-hidden rounded-b-xl">
       <img
-        v-if="anime.bannerImage"
-        :src="anime.bannerImage"
+        v-if="mangaDetail.bannerImage"
+        :src="mangaDetail.bannerImage"
         class="w-full h-full object-cover"
-        :alt="anime.title?.romaji"
+        :alt="mangaDetail.title?.romaji"
       />
       <div
         v-else
         class="w-full h-full"
-        :style="{ background: anime.coverImage?.color || '#20222d' }"
+        :style="{ background: mangaDetail.coverImage?.color || '#20222d' }"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-base-100 via-base-100/40 to-transparent" />
     </div>
@@ -122,35 +124,36 @@ watch(
       <!-- Header: poster + info -->
       <div class="flex flex-col sm:flex-row gap-5 mb-8">
         <img
-          :src="anime.coverImage?.large"
-          :alt="anime.title?.romaji"
-          class="w-40 sm:w-48 rounded-xl shadow-2xl border border-white/10 shrink-0"
+          :src="mangaDetail.coverImage?.large"
+          :alt="mangaDetail.title?.romaji"
+          class="w-40 sm:w-48 rounded-xl shadow-2xl border border-white/10 shrink-0 h-70"
         />
         <div class="flex-1 min-w-0 pt-2 sm:pt-20">
           <div class="flex flex-wrap items-center gap-2 mb-2">
-            <span class="badge badge-neutral">{{ anime.status?.replaceAll('_', ' ') }}</span>
-            <span v-if="anime.format" class="badge badge-outline">{{ anime.format }}</span>
+            <span class="badge badge-neutral">{{ mangaDetail.status?.replaceAll('_', ' ') }}</span>
             <span v-if="sourceLabel" class="badge badge-outline">{{ sourceLabel }}</span>
             <span v-if="score" class="badge badge-warning gap-1 font-bold"
               ><Star class="w-3 h-3" /> {{ score }}</span
             >
-            <span v-if="anime.popularity" class="badge badge-secondary gap-1"
-              ><Heart class="w-3 h-3" /> {{ anime.popularity }}</span
+            <span v-if="mangaDetail.popularity" class="badge badge-secondary gap-1"
+              ><Heart class="w-3 h-3" /> {{ mangaDetail.popularity }}</span
             >
           </div>
           <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-2">
-            {{ anime.title?.romaji }}
+            {{ mangaDetail.title?.romaji }}
           </h1>
           <p
-            v-if="anime.title?.english && anime.title.english !== anime.title.romaji"
+            v-if="
+              mangaDetail.title?.english && mangaDetail.title.english !== mangaDetail.title.romaji
+            "
             class="text-sm text-base-content/60 mb-3"
           >
-            {{ anime.title.english }}
+            {{ mangaDetail.title.english }}
           </p>
 
           <div class="flex flex-wrap gap-1.5 mb-3">
             <span
-              v-for="g in anime.genres"
+              v-for="g in mangaDetail.genres"
               :key="g"
               class="badge badge-sm badge-primary badge-outline"
             >
@@ -158,19 +161,17 @@ watch(
             </span>
           </div>
 
-          <div class="flex flex-wrap gap-x-5 gap-y-1 text-md text-base-content/70 mb-3">
-            <span v-if="anime.duration">{{ anime.duration }} mins</span>
-            <span v-if="anime.episodes">{{ anime.episodes }} episodes</span>
-            <span v-if="anime.season && anime.seasonYear"
-              >{{ anime.season }} {{ anime.seasonYear }}</span
-            >
-            <span v-if="studios.length">{{ studios.map((s) => s.name).join(', ') }}</span>
+          <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-base-content/70 mb-3">
+            <span v-if="mangaDetail.chapters">{{ mangaDetail.chapters }} chapters</span>
+            <span v-else-if="mangaDetail.status === 'RELEASING'">N/A</span>
+            <span v-if="mangaDetail.volumes">{{ mangaDetail.volumes }} volumes</span>
+            <span v-if="dateRange">{{ dateRange }}</span>
           </div>
         </div>
       </div>
 
+      <!-- Synopsis -->
       <div class="grid grid-cols-1 gap-6 mb-10" :class="trailerUrl ? 'lg:grid-cols-3' : ''">
-        <!-- Synopsis -->
         <div :class="trailerUrl ? 'lg:col-span-2' : ''">
           <p
             class="text-md leading-relaxed text-base-content/80 text-justify whitespace-pre-line mb-8"
@@ -190,8 +191,8 @@ watch(
             </template>
             <template v-else>
               <img
-                v-if="anime.trailer?.thumbnail"
-                :src="anime.trailer.thumbnail"
+                v-if="mangaDetail.trailer?.thumbnail"
+                :src="mangaDetail.trailer.thumbnail"
                 class="w-full h-full object-cover"
                 alt="Trailer thumbnail"
               />
@@ -206,6 +207,21 @@ watch(
           </div>
         </div>
       </div>
+      <!-- staff -->
+      <div v-if="staff.length" class="mb-10">
+        <h2 class="text-lg font-semibold mb-4">Staff</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div v-for="s in staff" :key="s.node.id" class="text-center">
+            <Card
+              :id="String(s.node.id)"
+              :title="s.node.name?.full"
+              :image="s.node.image?.large"
+              :role="s.role"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Characters -->
       <div v-if="characters.length" class="mb-10">
         <h2 class="text-lg font-semibold mb-4">Characters</h2>
@@ -215,7 +231,6 @@ watch(
               :id="String(c.node.id)"
               :title="c.node.name.full"
               :image="c.node.image?.large"
-              :voiceActors="c.voiceActors[0].name.full"
               :role="c.role"
             />
           </div>
@@ -262,23 +277,22 @@ watch(
       <!-- Tab: Recommendations -->
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <p v-if="!recommendations.length" class="text-sm text-base-content/50 col-span-full">
-          No recommendations available for this anime.
+          No recommendations available for this manga.
         </p>
         <RouterLink
           v-for="rec in recommendations"
           :key="rec.id"
-          :to="{ name: 'DetailAnime', params: { id: rec.id } }"
+          :to="{ name: 'DetailManga', params: { id: rec.id } }"
         >
           <Card
             :id="String(rec.id)"
             :title="rec.title?.romaji"
             :image="rec.coverImage?.large"
             :status="rec.status"
-            :episodes="rec.episodes"
-            :season="rec.season"
-            :year="rec.seasonYear"
+            :chapters="rec.chapters"
             :rating="rec.averageScore ? (rec.averageScore / 10).toFixed(1) : null"
             :format="rec.format"
+            :year="rec.startDate?.year"
           />
         </RouterLink>
       </div>

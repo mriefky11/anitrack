@@ -78,17 +78,21 @@ onMounted(() => {
       <Card v-for="n in 10" :key="n" :loading="true" />
     </template>
     <template v-else>
-      <Card
+      <router-link
+        :to="{ name: 'DetailManga', params: { id: manga.id } }"
         v-for="manga in mangaList"
-        :key="manga.mal_id"
-        :id="String(manga.mal_id)"
-        :title="manga.title?.romaji"
-        :image="manga.coverImage?.large"
-        :popularity="manga.popularity"
-        :status="manga.status"
-        :chapters="manga.volumes"
-        :year="manga.startDate?.year"
-      />
+        :key="manga.id"
+      >
+        <Card
+          :id="String(manga.id)"
+          :title="manga.title?.romaji"
+          :image="manga.coverImage?.large"
+          :popularity="manga.popularity"
+          :status="manga.status"
+          :chapters="manga.volumes"
+          :year="manga.startDate?.year"
+        />
+      </router-link>
     </template>
   </div>
 
