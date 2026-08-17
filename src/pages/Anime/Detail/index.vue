@@ -1,30 +1,32 @@
-<!-- src/pages/Anime/Detail/index.vue -->
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { getAnimeDetail } from '@/api/Anime'
+import { useAnimeStore } from '@/stores/Anime'
+import { storeToRefs } from 'pinia'
 import { cleanDescription } from '@/utils/text'
 import Card from '@/components/Reusable/Card/index.vue'
 import { Star, Play, Heart } from '@lucide/vue'
 
+const animeStore = useAnimeStore()
+const { fetchAnimeDetail } = animeStore
+const { animeDetail, loading, error } = storeToRefs(animeStore)
+
 const route = useRoute()
-const anime = ref(null)
-const loading = ref(true)
-const error = ref(null)
 const activeTab = ref('overview')
 const showTrailer = ref(false)
 
-const description = computed(() => cleanDescription(anime.value?.description))
+const description = computed(() => cleanDescription(animeDetail.value?.description))
 const score = computed(() =>
-  anime.value?.averageScore ? (anime.value.averageScore / 10).toFixed(1) : null,
+  animeDetail.value?.averageScore ? (animeDetail.value.averageScore / 10).toFixed(1) : null,
 )
-const studios = computed(() => anime.value?.studios?.edges?.map((e) => e.node) ?? [])
+const studios = computed(() => animeDetail.value?.studios?.edges?.map((e) => e.node) ?? [])
 const recommendations = computed(
   () =>
-    anime.value?.recommendations?.nodes?.map((n) => n.mediaRecommendation).filter(Boolean) ?? [],
+    animeDetail.value?.recommendations?.nodes?.map((n) => n.mediaRecommendation).filter(Boolean) ??
+    [],
 )
-const reviews = computed(() => anime.value?.reviews?.nodes ?? [])
-const characters = computed(() => anime.value?.characters?.edges ?? [])
+const reviews = computed(() => animeDetail.value?.reviews?.nodes ?? [])
+const characters = computed(() => animeDetail.value?.characters?.edges ?? [])
 
 const sourceLabel = computed(() => {
   const map = {
@@ -44,34 +46,21 @@ const sourceLabel = computed(() => {
     PICTURE_BOOK: 'Picture Book',
     OTHER: 'Other',
   }
-  return map[anime.value?.source] ?? null
+  return map[animeDetail.value?.source] ?? null
 })
 
 const trailerUrl = computed(() => {
-  const t = anime.value?.trailer
+  const t = animeDetail.value?.trailer
   if (!t) return null
   if (t.site === 'youtube') return `https://www.youtube.com/embed/${t.id}?autoplay=1`
   if (t.site === 'dailymotion') return `https://www.dailymotion.com/embed/video/${t.id}?autoplay=1`
   return null
 })
 
-async function fetchDetail(id) {
-  loading.value = true
-  error.value = null
-  showTrailer.value = false
-  try {
-    anime.value = await getAnimeDetail(Number(id))
-  } catch (err) {
-    error.value = err
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => fetchDetail(route.params.id))
+onMounted(() => fetchAnimeDetail(route.params.id))
 watch(
   () => route.params.id,
-  (id) => id && fetchDetail(id),
+  (id) => id && fetchAnimeDetail(id),
 )
 </script>
 
@@ -95,25 +84,25 @@ watch(
   <div v-else-if="error" class="mx-auto px-10 py-16 text-center">
     <p class="text-lg font-medium mb-1">Failed to load anime details</p>
     <p class="text-sm text-base-content/60 mb-4">
-      {{ error.message || 'Something went wrong, please try again.' }}
+      {{ 'Something went wrong, please try again.' }}
     </p>
-    <button class="btn btn-sm btn-primary" @click="fetchDetail(route.params.id)">Retry</button>
+    <button class="btn btn-sm btn-primary" @click="fetchAnimeDetail(route.params.id)">Retry</button>
   </div>
 
   <!-- CONTENT -->
-  <div v-else-if="anime" class="pb-16 px-10">
+  <div v-else-if="animeDetail" class="pb-16 px-10">
     <!-- Banner -->
     <div class="relative w-full h-56 md:h-72 overflow-hidden rounded-b-xl">
       <img
-        v-if="anime.bannerImage"
-        :src="anime.bannerImage"
+        v-if="animeDetail.bannerImage"
+        :src="animeDetail.bannerImage"
         class="w-full h-full object-cover"
-        :alt="anime.title?.romaji"
+        :alt="animeDetail.title?.romaji"
       />
       <div
         v-else
         class="w-full h-full"
-        :style="{ background: anime.coverImage?.color || '#20222d' }"
+        :style="{ background: animeDetail.coverImage?.color || '#20222d' }"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-base-100 via-base-100/40 to-transparent" />
     </div>
@@ -122,35 +111,39 @@ watch(
       <!-- Header: poster + info -->
       <div class="flex flex-col sm:flex-row gap-5 mb-8">
         <img
-          :src="anime.coverImage?.large"
-          :alt="anime.title?.romaji"
+          :src="animeDetail.coverImage?.large"
+          :alt="animeDetail.title?.romaji"
           class="w-40 sm:w-48 rounded-xl shadow-2xl border border-white/10 shrink-0"
         />
         <div class="flex-1 min-w-0 pt-2 sm:pt-20">
           <div class="flex flex-wrap items-center gap-2 mb-2">
-            <span class="badge badge-neutral">{{ anime.status?.replaceAll('_', ' ') }}</span>
-            <span v-if="anime.format" class="badge badge-outline">{{ anime.format }}</span>
+            <span class="badge badge-neutral">{{ animeDetail.status?.replaceAll('_', ' ') }}</span>
+            <span v-if="animeDetail.format" class="badge badge-outline">{{
+              animeDetail.format
+            }}</span>
             <span v-if="sourceLabel" class="badge badge-outline">{{ sourceLabel }}</span>
             <span v-if="score" class="badge badge-warning gap-1 font-bold"
               ><Star class="w-3 h-3" /> {{ score }}</span
             >
-            <span v-if="anime.popularity" class="badge badge-secondary gap-1"
-              ><Heart class="w-3 h-3" /> {{ anime.popularity }}</span
+            <span v-if="animeDetail.popularity" class="badge badge-secondary gap-1"
+              ><Heart class="w-3 h-3" /> {{ animeDetail.popularity }}</span
             >
           </div>
           <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-2">
-            {{ anime.title?.romaji }}
+            {{ animeDetail.title?.romaji }}
           </h1>
           <p
-            v-if="anime.title?.english && anime.title.english !== anime.title.romaji"
+            v-if="
+              animeDetail.title?.english && animeDetail.title.english !== animeDetail.title.romaji
+            "
             class="text-sm text-base-content/60 mb-3"
           >
-            {{ anime.title.english }}
+            {{ animeDetail.title.english }}
           </p>
 
           <div class="flex flex-wrap gap-1.5 mb-3">
             <span
-              v-for="g in anime.genres"
+              v-for="g in animeDetail.genres"
               :key="g"
               class="badge badge-sm badge-primary badge-outline"
             >
@@ -159,10 +152,10 @@ watch(
           </div>
 
           <div class="flex flex-wrap gap-x-5 gap-y-1 text-md text-base-content/70 mb-3">
-            <span v-if="anime.duration">{{ anime.duration }} mins</span>
-            <span v-if="anime.episodes">{{ anime.episodes }} episodes</span>
-            <span v-if="anime.season && anime.seasonYear"
-              >{{ anime.season }} {{ anime.seasonYear }}</span
+            <span v-if="animeDetail.duration">{{ animeDetail.duration }} mins</span>
+            <span v-if="animeDetail.episodes">{{ animeDetail.episodes }} episodes</span>
+            <span v-if="animeDetail.season && animeDetail.seasonYear"
+              >{{ animeDetail.season }} {{ animeDetail.seasonYear }}</span
             >
             <span v-if="studios.length">{{ studios.map((s) => s.name).join(', ') }}</span>
           </div>
@@ -190,8 +183,8 @@ watch(
             </template>
             <template v-else>
               <img
-                v-if="anime.trailer?.thumbnail"
-                :src="anime.trailer.thumbnail"
+                v-if="animeDetail.trailer?.thumbnail"
+                :src="animeDetail.trailer.thumbnail"
                 class="w-full h-full object-cover"
                 alt="Trailer thumbnail"
               />

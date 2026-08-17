@@ -10,6 +10,7 @@ export default {
       this.animeList = res
     } catch (err) {
       this.error = err
+      console.error(err)
     } finally {
       this.loading = false
     }
@@ -20,11 +21,12 @@ export default {
     this.error = null
 
     try {
-      const res = await api.Anime.getById(id)
+      const res = await api.Anime.getAnimeDetail(id)
 
-      this.animeDetail = res.data.data
+      this.animeDetail = res
     } catch (err) {
       this.error = err
+      console.error(err)
     } finally {
       this.loading = false
     }
@@ -39,6 +41,7 @@ export default {
       this.animeList = res
     } catch (err) {
       this.error = err
+      console.error(err)
     } finally {
       this.loading = false
     }

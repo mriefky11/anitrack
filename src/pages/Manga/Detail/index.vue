@@ -73,7 +73,7 @@ onMounted(() => {
 
 watch(
   () => route.params.id,
-  (id) => id && fetchDetailManga(route.params.id),
+  (id) => id && fetchDetailManga(id),
 )
 </script>
 
@@ -97,9 +97,9 @@ watch(
   <div v-else-if="error" class="mx-auto px-10 py-16 text-center">
     <p class="text-lg font-medium mb-1">Failed to load manga details</p>
     <p class="text-sm text-base-content/60 mb-4">
-      {{ error.message || 'Something went wrong, please try again.' }}
+      {{ 'Something went wrong, please try again.' }}
     </p>
-    <button class="btn btn-sm btn-primary" @click="fetchDetail(route.params.id)">Retry</button>
+    <button class="btn btn-sm btn-primary" @click="fetchDetailManga(route.params.id)">Retry</button>
   </div>
 
   <!-- content -->
