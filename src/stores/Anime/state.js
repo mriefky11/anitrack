@@ -1,6 +1,8 @@
 export default () => ({
   animeList: [],
-  animeDetail: null,
+  seasonalList: [],
   loading: false,
+  seasonalPageInfo: null,
+  animeDetail: null,
   error: null,
 })

@@ -69,7 +69,7 @@ const statusLabel = {
       </span>
     </figure>
     <div class="card-body p-3 gap-1 text-center">
-      <p class="card-title text-md font-medium leading-snug line-clamp-1">
+      <p class="card-title text-sm font-medium leading-snug line-clamp-1">
         {{ title }}
       </p>
       <p class="text-xs text-base-content/50">
