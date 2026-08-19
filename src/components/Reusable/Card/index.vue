@@ -15,6 +15,7 @@ const props = defineProps({
   format: { type: String, default: null },
   voiceActors: { type: String, default: null },
   role: { type: String, default: null },
+  countdown: { type: Object, default: null },
 })
 
 const statusClass = {
@@ -67,6 +68,29 @@ const statusLabel = {
       >
         {{ statusLabel[status] ?? status }}
       </span>
+
+      <!-- countdown -->
+      <div
+        v-if="countdown"
+        class="countdown font-mono text-md absolute bottom-2 left-1/2 -translate-x-1/2 bg-base-100/85 backdrop-blur rounded-md px-2 py-1 gap-1 flex items-center justify-center"
+      >
+        <span :style="{ '--value': countdown.days }" :aria-label="countdown.days">{{
+          countdown.days
+        }}</span
+        >d
+        <span :style="{ '--value': countdown.hours }" :aria-label="countdown.hours">{{
+          countdown.hours
+        }}</span
+        >h
+        <span :style="{ '--value': countdown.minutes }" :aria-label="countdown.minutes">{{
+          countdown.minutes
+        }}</span
+        >m
+        <span :style="{ '--value': countdown.seconds }" :aria-label="countdown.seconds">{{
+          countdown.seconds
+        }}</span
+        >s
+      </div>
     </figure>
     <div class="card-body p-3 gap-1 text-center">
       <p class="card-title text-sm font-medium leading-snug line-clamp-1">

@@ -69,13 +69,28 @@ export const getSeasonalAnime = (year, season, page = 1, perPage = 20) =>
     { year, season: season.toUpperCase(), page, perPage },
   ).then((d) => ({ items: d.Page.media, pageInfo: d.Page.pageInfo }))
 
-// Weekly schedule — paginated, 20/halaman
-export const getWeeklySchedule = (weekStart, weekEnd, page = 1, perPage = 20) =>
-  gql(
+async function fetchAllPages(query, variables, getItems) {
+  const MAX_PAGES = 6
+  let page = 1
+  let all = []
+
+  while (page <= MAX_PAGES) {
+    const data = await gql(query, { ...variables, page, perPage: 50 })
+    const { items, hasNextPage } = getItems(data)
+    all = all.concat(items)
+    if (!hasNextPage) break
+    page++
+  }
+
+  return all
+}
+
+export const getWeeklySchedule = (weekStart, weekEnd) =>
+  fetchAllPages(
     `
     query ($start: Int, $end: Int, $page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {
-        pageInfo { currentPage hasNextPage lastPage total }
+        pageInfo { hasNextPage }
         airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: TIME) {
           airingAt
           episode
@@ -84,8 +99,9 @@ export const getWeeklySchedule = (weekStart, weekEnd, page = 1, perPage = 20) =>
       }
     }
   `,
-    { start: weekStart, end: weekEnd, page, perPage },
-  ).then((d) => ({ items: d.Page.airingSchedules, pageInfo: d.Page.pageInfo }))
+    { start: weekStart, end: weekEnd },
+    (d) => ({ items: d.Page.airingSchedules, hasNextPage: d.Page.pageInfo.hasNextPage }),
+  )
 
 export const searchAnime = (keyword, limit = 10) =>
   gql(

@@ -17,7 +17,7 @@ const sections = [
     items: [
       { label: 'Home', to: 'Home', icon: Home, exact: true },
       { label: 'Seasonal', to: 'Seasonal', icon: Tv2 },
-      // { label: 'Schedule', to: 'anime/schedule', icon: Calendar },
+      { label: 'Schedule', to: 'Schedule', icon: Calendar },
       // { label: 'Manga', to: '/manga', icon: BookOpen },
     ],
   },

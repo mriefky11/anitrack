@@ -60,4 +60,17 @@ export default {
       this.loading = false
     }
   },
+
+  async fetchWeeklySchedule(weekStart, weekEnd) {
+    this.loading = true
+    this.error = null
+    try {
+      const res = await api.Anime.getWeeklySchedule(weekStart, weekEnd)
+      this.weeklySchedule = res
+    } catch (err) {
+      console.error(err)
+    } finally {
+      this.loading = false
+    }
+  },
 }
