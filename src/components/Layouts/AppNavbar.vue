@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { Sun, Moon, Search } from '@lucide/vue'
+import { Sun, Moon } from '@lucide/vue'
 
 defineProps({
   open: {
@@ -12,22 +11,13 @@ defineProps({
 
 const emit = defineEmits(['toggle'])
 
-const router = useRouter()
 const isDark = ref(document.documentElement.getAttribute('data-theme') === 'dark')
-const searchQuery = ref('')
 
 function toggleDark() {
   isDark.value = !isDark.value
   const theme = isDark.value ? 'dark' : 'light'
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
-}
-
-function handleSearch(e) {
-  if (e.key === 'Enter' && searchQuery.value.trim()) {
-    router.push({ path: '/search', query: { q: searchQuery.value.trim() } })
-    searchQuery.value = ''
-  }
 }
 </script>
 

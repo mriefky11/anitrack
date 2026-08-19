@@ -15,23 +15,23 @@ const sections = [
   {
     label: null,
     items: [
-      { label: 'Home', to: '/', icon: Home, exact: true },
-      { label: 'Seasonal', to: 'anime/seasonal', icon: Tv2 },
-      { label: 'Schedule', to: 'anime/schedule', icon: Calendar },
-      { label: 'Manga', to: '/manga', icon: BookOpen },
+      { label: 'Home', to: 'Home', icon: Home, exact: true },
+      { label: 'Seasonal', to: 'Seasonal', icon: Tv2 },
+      // { label: 'Schedule', to: 'anime/schedule', icon: Calendar },
+      // { label: 'Manga', to: '/manga', icon: BookOpen },
     ],
   },
   {
     label: 'Discover',
     items: [
-      { label: 'Top Anime', to: '/top', icon: TrendingUp },
-      { label: 'Top Manga', to: '/top', icon: TrendingUp },
-      { label: 'Top Character', to: '/top', icon: TrendingUp },
+      // { label: 'Top Anime', to: '/top', icon: TrendingUp },
+      // { label: 'Top Manga', to: '/top', icon: TrendingUp },
+      // { label: 'Top Character', to: '/top', icon: TrendingUp },
     ],
   },
   {
     label: 'My List',
-    items: [{ label: 'Watchlist', to: '/watchlist', icon: Heart }],
+    // items: [{ label: 'Watchlist', to: '/watchlist', icon: Heart }],
   },
 ]
 
@@ -44,8 +44,8 @@ function isActive(item) {
 <template>
   <aside
     :class="[
-      'flex flex-col shrink-0 bg-base-200 border-r border-base-300 transition-all duration-300 ease-in-out h-screen overflow-y-auto',
-      open ? 'w-64' : 'w-14 overflow-visible',
+      'flex flex-col shrink-0 bg-base-200 border-r border-base-300 transition-all duration-300 ease-in-out h-screen',
+      open ? 'w-64' : 'w-14',
     ]"
   >
     <!-- Brand -->
@@ -72,7 +72,7 @@ function isActive(item) {
         <!-- Items -->
         <li v-for="item in section.items" :key="item.to">
           <RouterLink
-            :to="item.to"
+            :to="{ name: item.to }"
             :data-tip="!open ? item.label : undefined"
             :class="[
               !open ? 'tooltip tooltip-right justify-center' : '',
