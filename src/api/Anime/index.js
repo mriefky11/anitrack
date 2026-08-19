@@ -49,7 +49,7 @@ export const getUpcomingAnime = (limit = 10) =>
   ).then((d) => d.Page.media)
 
 // Seasonal — paginated, 20/halaman
-export const getSeasonalAnime = (year, season, page = 1, perPage = 18) =>
+export const getSeasonalAnime = (year, season, page = 1, perPage = 20) =>
   gql(
     `
     query ($year: Int, $season: MediaSeason, $page: Int, $perPage: Int) {

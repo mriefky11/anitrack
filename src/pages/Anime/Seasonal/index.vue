@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import TabsNav from '@/components/Reusable/TabNav/index.vue'
 import Card from '@/components/Reusable/Card/index.vue'
 import Pagination from '@/components/Reusable/Pagination/index.vue'
+import DatePicker from '@/components/Atoms/DatePicker/index.vue'
 import { RouterLink } from 'vue-router'
 import { Snowflake, Flower2, Sun, Leaf } from '@lucide/vue'
 
@@ -32,8 +33,6 @@ const selectedYear = ref(currentYear)
 const selectedSeason = ref(getCurrentSeason())
 const currentPage = ref(1)
 
-const years = Array.from({ length: 30 }, (_, i) => currentYear - i)
-
 function load() {
   fetchSeasonalAnime(selectedYear.value, selectedSeason.value, currentPage.value)
 }
@@ -44,6 +43,10 @@ function handlePrev() {
 
 function handleNext() {
   currentPage.value++
+}
+
+function handleYearCleared() {
+  selectedYear.value = currentYear
 }
 
 onMounted(load)
@@ -60,9 +63,13 @@ watch(currentPage, load)
   <div class="px-10 py-6">
     <div class="flex items-center justify-between gap-3 mb-10">
       <h1 class="font-bold text-4xl">Seasonal</h1>
-      <select v-model.number="selectedYear" class="select select-bordered select-md">
-        <option v-for="y in years" :key="y" :value="y">{{ y }}</option>
-      </select>
+      <DatePicker
+        v-model="selectedYear"
+        mode="year"
+        @cleared="handleYearCleared"
+        dark
+        class="w-1/10"
+      />
     </div>
 
     <TabsNav v-model="selectedSeason" :tabs="seasons" />
@@ -70,7 +77,7 @@ watch(currentPage, load)
     <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
       <Card v-for="n in 12" :key="n" loading />
     </div>
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
       <RouterLink
         v-for="anime in seasonalList"
         :key="anime.id"

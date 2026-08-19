@@ -50,7 +50,7 @@ const statusLabel = {
   >
     <figure class="relative aspect-[2/3] overflow-hidden bg-base-200">
       <img :src="image" :alt="title" class="w-full h-full object-cover" />
-      <div class="absolute top-2 left-2 flex flex-col gap-1 items-start">
+      <div class="absolute top-2 left-2 flex flex-col gap-1 items-start text-sm">
         <span v-if="rating" class="badge badge-warning badge-md font-bold">
           <Star class="w-3 h-3" />
           {{ rating }}
