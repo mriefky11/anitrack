@@ -24,17 +24,18 @@ const MEDIA_FIELDS = `
   }
 `
 
-export const getTopAnime = (limit = 10) =>
+export const getTopAnime = (limit = 20, page = 1) =>
   gql(
     `
     query ($page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {
+        pageInfo { currentPage hasNextPage lastPage total }
         media(type: ANIME, sort: SCORE_DESC, isAdult: false) { ${MEDIA_FIELDS} }
       }
     }
   `,
-    { page: 1, perPage: limit },
-  ).then((d) => d.Page.media)
+    { page, perPage: limit },
+  ).then((d) => ({ items: d.Page.media, pageInfo: d.Page.pageInfo }))
 
 export const getUpcomingAnime = (limit = 10) =>
   gql(
@@ -106,12 +107,12 @@ export const getWeeklySchedule = (weekStart, weekEnd) =>
 export const searchAnime = (keyword, limit = 10) =>
   gql(
     `
-    query ($search: String, $page: Int, $perPage: Int) {
-      Page(page: $page, perPage: $perPage) {
-        media(type: ANIME, search: $search, isAdult: false) { ${MEDIA_FIELDS} }
+      query ($search: String, $page: Int, $perPage: Int) {
+        Page(page: $page, perPage: $perPage) {
+          media(type: ANIME, search: $search, isAdult: false) { ${MEDIA_FIELDS} }
+        }
       }
-    }
-  `,
+    `,
     { search: keyword, page: 1, perPage: limit },
   ).then((d) => d.Page.media)
 

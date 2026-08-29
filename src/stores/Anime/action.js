@@ -1,21 +1,6 @@
 import api from '@/api'
 
 export default {
-  async fetchAnimeList(params = {}) {
-    this.loading = true
-    this.error = null
-
-    try {
-      const res = await api.Anime.getList(params)
-      this.animeList = res
-    } catch (err) {
-      this.error = err
-      console.error(err)
-    } finally {
-      this.loading = false
-    }
-  },
-
   async fetchAnimeDetail(id) {
     this.loading = true
     this.error = null
@@ -32,13 +17,14 @@ export default {
     }
   },
 
-  async fetchTopAnime(params = {}) {
+  async fetchTopAnime({ limit = 10, page = 1 } = {}) {
     this.loading = true
     this.error = null
 
     try {
-      const res = await api.Anime.getTopAnime(params)
-      this.animeList = res
+      const { items, pageInfo } = await api.Anime.getTopAnime(limit, page)
+      this.animeList = items
+      this.animePageInfo = pageInfo
     } catch (err) {
       this.error = err
       console.error(err)
@@ -68,6 +54,20 @@ export default {
       const res = await api.Anime.getWeeklySchedule(weekStart, weekEnd)
       this.weeklySchedule = res
     } catch (err) {
+      console.error(err)
+    } finally {
+      this.loading = false
+    }
+  },
+
+  async searchAnime(keyword) {
+    this.loading = true
+    this.error = null
+    try {
+      this.animeList = await api.Anime.searchAnime(keyword, 10)
+      this.animePageInfo = null
+    } catch (err) {
+      this.error = err
       console.error(err)
     } finally {
       this.loading = false

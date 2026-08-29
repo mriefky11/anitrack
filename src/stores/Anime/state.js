@@ -4,6 +4,7 @@ export default () => ({
   weeklySchedule: [],
   loading: false,
   seasonalPageInfo: null,
+  animePageInfo: null,
   animeDetail: null,
   error: null,
 })
