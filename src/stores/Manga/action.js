@@ -1,16 +1,15 @@
 import api from '@/api'
 
 export default {
-  async fetchTopManga(params = {}) {
+  async fetchTopManga({ limit = 10, page = 1 } = {}) {
     this.loading = true
     this.error = null
-
     try {
-      const res = await api.Manga.getTopManga(params)
-      this.mangaList = res
+      const { items, pageInfo } = await api.Manga.getTopManga(limit, page)
+      this.mangaList = items
+      this.mangaPageInfo = pageInfo
     } catch (err) {
       this.error = err
-      console.error(err)
     } finally {
       this.loading = false
     }
@@ -26,6 +25,20 @@ export default {
     } catch (err) {
       this.error = err
       console.error(err)
+    } finally {
+      this.loading = false
+    }
+  },
+
+  async searchManga(keyword, { limit = 10, page = 1 } = {}) {
+    this.loading = true
+    this.error = null
+    try {
+      const { items, pageInfo } = await api.Manga.searchManga(keyword, limit, page)
+      this.mangaList = items
+      this.mangaPageInfo = pageInfo
+    } catch (err) {
+      this.error = err
     } finally {
       this.loading = false
     }

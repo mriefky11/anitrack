@@ -17,29 +17,31 @@ const MANGA_FIELDS = `
   endDate { day month year }
 `
 
-export const getTopManga = (limit = 10) =>
+export const getTopManga = (limit = 10, page = 1) =>
   gql(
     `
     query ($page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {
+        pageInfo { total currentPage lastPage hasNextPage }
         media(type: MANGA, sort: POPULARITY_DESC, isAdult: false) { ${MANGA_FIELDS} }
       }
     }
   `,
-    { page: 1, perPage: limit },
-  ).then((d) => d.Page.media)
+    { page, perPage: limit },
+  ).then((d) => ({ items: d.Page.media, pageInfo: d.Page.pageInfo }))
 
-export const searchManga = (keyword, limit = 10) =>
+export const searchManga = (keyword, limit = 10, page = 1) =>
   gql(
     `
-    query ($search: String, $page: Int, $perPage: Int) {
-      Page(page: $page, perPage: $perPage) {
-        media(type: MANGA, search: $search, isAdult: false) { ${MANGA_FIELDS} }
+      query ($search: String, $page: Int, $perPage: Int) {
+        Page(page: $page, perPage: $perPage) {
+          pageInfo { total currentPage lastPage hasNextPage }
+          media(type: MANGA, search: $search, isAdult: false) { ${MANGA_FIELDS} }
+        }
       }
-    }
-  `,
-    { search: keyword, page: 1, perPage: limit },
-  ).then((d) => d.Page.media)
+    `,
+    { search: keyword, page, perPage: limit },
+  ).then((d) => ({ items: d.Page.media, pageInfo: d.Page.pageInfo }))
 
 // Detail + characters + staff + recommendations + reviews
 export const getMangaDetail = (id) =>
