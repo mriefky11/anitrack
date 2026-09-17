@@ -3,6 +3,7 @@ import Seasonal from '@/pages/Anime/Seasonal/index.vue'
 import DetailAnime from '@/pages/Anime/Detail/index.vue'
 import Schedule from '@/pages/Anime/Schedule/index.vue'
 import ListAnime from '@/pages/Anime/List/index.vue'
+import Watchlist from '@/pages/Anime/Watchlist/index.vue'
 
 export default [
   {
@@ -28,6 +29,11 @@ export default [
         path: 'list',
         name: 'ListAnime',
         component: ListAnime,
+      },
+      {
+        path: 'watchlist',
+        name: 'Watchlist',
+        component: Watchlist,
       },
     ],
   },

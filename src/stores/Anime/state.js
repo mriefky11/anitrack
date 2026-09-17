@@ -7,4 +7,5 @@ export default () => ({
   animePageInfo: null,
   animeDetail: null,
   error: null,
+  watchlist: JSON.parse(localStorage.getItem('watchlist') || '[]'),
 })

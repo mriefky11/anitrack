@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { Home, Tv2, Calendar, List } from '@lucide/vue'
+import { Home, Tv2, Calendar, List, Tv2Icon } from '@lucide/vue'
 
 defineProps({
   open: {
@@ -19,6 +19,7 @@ const sections = [
       { label: 'Seasonal', to: 'Seasonal', icon: Tv2 },
       { label: 'Schedule', to: 'Schedule', icon: Calendar },
       { label: 'List Anime', to: 'ListAnime', icon: List },
+      { label: 'Watchlist', to: 'Watchlist', icon: Tv2Icon },
     ],
   },
 ]

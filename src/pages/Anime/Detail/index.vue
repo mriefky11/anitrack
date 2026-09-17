@@ -5,10 +5,10 @@ import { useAnimeStore } from '@/stores/Anime'
 import { storeToRefs } from 'pinia'
 import { cleanDescription } from '@/utils/text'
 import Card from '@/components/Reusable/Card/index.vue'
-import { Star, Play, Heart } from '@lucide/vue'
+import { Star, Play, Heart, Tv2Icon } from '@lucide/vue'
 
 const animeStore = useAnimeStore()
-const { fetchAnimeDetail } = animeStore
+const { fetchAnimeDetail, toggle, isFavorited } = animeStore
 const { animeDetail, loading, error } = storeToRefs(animeStore)
 
 const route = useRoute()
@@ -128,6 +128,34 @@ watch(
             <span v-if="animeDetail.popularity" class="badge badge-secondary gap-1"
               ><Heart class="w-3 h-3" /> {{ animeDetail.popularity }}</span
             >
+
+            <button
+              class="badge gap-1 font-bold cursor-pointer border-0 transition-colors"
+              :class="
+                isFavorited(String(animeDetail.id))
+                  ? 'badge-primary text-white'
+                  : 'badge-accent hover:badge-neutral hover:text-white'
+              "
+              @click="
+                toggle({
+                  id: String(animeDetail.id),
+                  title: animeDetail.title?.romaji,
+                  image: animeDetail.coverImage?.large,
+                  rating: score,
+                  status: animeDetail.status,
+                  episodes: animeDetail.episodes,
+                  format: animeDetail.format,
+                  season: animeDetail.season,
+                  year: animeDetail.seasonYear,
+                })
+              "
+            >
+              <Tv2Icon
+                class="w-3 h-3"
+                :class="isFavorited(String(animeDetail.id)) ? 'fill-white' : ''"
+              />
+              {{ isFavorited(String(animeDetail.id)) ? 'Watchlist' : 'Add to Watchlist' }}
+            </button>
           </div>
           <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-2">
             {{ animeDetail.title?.romaji }}

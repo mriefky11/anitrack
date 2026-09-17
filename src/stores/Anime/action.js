@@ -73,4 +73,23 @@ export default {
       this.loading = false
     }
   },
+
+  toggle(anime) {
+    const idx = this.watchlist.findIndex((f) => f.id === anime.id)
+    if (idx === -1) {
+      this.watchlist.push(anime)
+    } else {
+      this.watchlist.splice(idx, 1)
+    }
+    localStorage.setItem('watchlist', JSON.stringify(this.watchlist))
+  },
+
+  isFavorited(id) {
+    return this.watchlist.some((f) => f.id === id)
+  },
+
+  clearAll() {
+    this.watchlist = []
+    localStorage.removeItem('watchlist')
+  },
 }
