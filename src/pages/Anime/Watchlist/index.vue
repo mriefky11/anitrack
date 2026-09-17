@@ -8,7 +8,7 @@ const { watchlist } = storeToRefs(animeStore)
 </script>
 
 <template>
-  <h1 class="text-2xl font-bold my-4 flex items-center gap-2">Watchlist</h1>
+  <h1 class="text-2xl font-bold my-4 flex items-center gap-2">Watch List</h1>
 
   <div v-if="watchlist.length === 0" class="text-center text-base-content/50 my-50">
     <p class="text-lg font-semibold">Your watchlist is empty.</p>

@@ -1,6 +1,6 @@
 <script setup>
 import { useMangaStore } from '@/stores/Manga'
-import { Heart, Play, Star } from '@lucide/vue'
+import { Heart, Play, Star, Tv2Icon } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
@@ -11,7 +11,7 @@ import Card from '@/components/Reusable/Card/index.vue'
 const route = useRoute()
 
 const mangaStore = useMangaStore()
-const { fetchDetailManga } = mangaStore
+const { fetchDetailManga, toggle, isFavorited } = mangaStore
 const { mangaDetail, loading, error } = storeToRefs(mangaStore)
 
 const activeTab = ref('overview')
@@ -138,6 +138,33 @@ watch(
             <span v-if="mangaDetail.popularity" class="badge badge-secondary gap-1"
               ><Heart class="w-3 h-3" /> {{ mangaDetail.popularity }}</span
             >
+            <button
+              class="badge gap-1 font-bold cursor-pointer border-0 transition-colors"
+              :class="
+                isFavorited(String(mangaDetail.id))
+                  ? 'badge-primary text-white'
+                  : 'badge-accent hover:badge-neutral hover:text-white'
+              "
+              @click="
+                toggle({
+                  id: String(mangaDetail.id),
+                  title: mangaDetail.title?.romaji,
+                  image: mangaDetail.coverImage?.large,
+                  rating: score,
+                  status: mangaDetail.status,
+                  episodes: mangaDetail.episodes,
+                  format: mangaDetail.format,
+                  season: mangaDetail.season,
+                  year: mangaDetail.seasonYear,
+                })
+              "
+            >
+              <Tv2Icon
+                class="w-3 h-3"
+                :class="isFavorited(String(mangaDetail.id)) ? 'fill-white' : ''"
+              />
+              {{ isFavorited(String(mangaDetail.id)) ? 'Readlist' : 'Add to Readlist' }}
+            </button>
           </div>
           <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-2">
             {{ mangaDetail.title?.romaji }}
